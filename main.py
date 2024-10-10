@@ -10,7 +10,7 @@ score={"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"wb":1,"nb":1,"db":0,"wk":0,"by
 scoreFreq={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":0,"db":0,"wk":0,"by":0,"lb":0,"rtd":0}
 wicketsMap={"b":"bowled","c":"caught","lbw":"lbw","c&b":"caught&bowled","ro":"runout","stm":"stumped","hw":"hitwicket","hb":"handled the ball","obs":"obstructing the feild","to":"timedout","rtdo":"retired out"}
 wicketFreq={"b":0,"c":0,"lbw":0,"c&b":0,"ro":0,"stm":0,"hw":0,"hb":0,"obs":0,"to":0,"rtdo":0}
-scoreMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"wb":0,"nb":0,"by":0,"lb":0,"rtd":0}
+scoreMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"wb":0,"nb":0,"by":0,"lb":0,"rtd":0,"db":0}
 #batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
 total=0
 wickets=0
@@ -90,10 +90,9 @@ while balls: #if there is a ball it has too be bowled
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
         balls-=1
         s,ns=strikeRotate(s,ns,extra_runs)
-        print(total)
-        print(scoreMap)
-        print(scoreFreq)
-        print("balls", balls)
+    elif x=="db":
+        bowlers[bowler_name][x]+=1
+        scoreFreq[x]+=1
     elif x=="wk":
         typeofw=input("type of dis")
         scenario_while_wicket=input("enter runs while wicket")
@@ -102,9 +101,6 @@ while balls: #if there is a ball it has too be bowled
         scoreMap[x]+=score[x]
         wicketFreq[typeofw] += 1
         balls-=1
-    elif x=="db":
-        curr_bowling_bowler["bowler"][x] += 1
-        print(curr_bowling_bowler)
     else: # from 1-6
         #updatin batsman's
         curr_playing_batsman[s]["balls"]+=1
