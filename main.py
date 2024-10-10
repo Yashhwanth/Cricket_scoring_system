@@ -1,5 +1,5 @@
 overs=int(input("no of overs to be played"))
-balls=overs*6
+balls=overs
 over_count=0
 tballs=balls
 batsmans={}
@@ -41,7 +41,7 @@ while balls: #if there is a ball it has too be bowled
     c=(tballs-balls)%6+1 # just to ask input score for each ball
     inputscene=input("enter score of {} ball".format(c)) #scenaio when ball is bowled
     x=inputScenario(inputscene) # to get correct scenario
-    '''if x=="wb" or x=="nb" or x=="by" or x=="lb": #runs can be scored even in illegal balls
+    if x=="wb" or x=="nb" or x=="by" or x=="lb": #runs can be scored even in illegal balls
         extra_in_illegal_ball=input("enter extra scenario") #what happened in illegal ball
         if extra_in_illegal_ball=="wk": #if wicket in illegal delivery,only in some cases its out
             wicketruns=input("runs before wicket") #may score runs before getting out
@@ -73,8 +73,8 @@ while balls: #if there is a ball it has too be bowled
         wicketFreq[typeofw] += 1
         balls-=1
     elif x=="db":
-        pass'''
-    else: # from 1-6
+        pass
+    else:      # from 1-6
         batsmanMap[x]+=1
         curr_playing_batsman[s]+=score[x]
         s,ns=strikeRotate(s,ns,x)
