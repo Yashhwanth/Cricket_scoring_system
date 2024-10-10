@@ -4,6 +4,7 @@ over_count=0
 tballs=balls
 batsmans={}
 bowlers={}
+
 bowlsmap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":1,"db":0,"wk":0,"by":0,"lb":0}
 score={"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"wb":1,"nb":1,"db":0,"wk":0,"by":0,"lb":0,"stm":0}
 scoreFreq={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":0,"db":0,"wk":0,"by":0,"lb":0,"rtd":0}
@@ -14,10 +15,16 @@ scoreMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"wb":0,"nb":0,"by":0,
 total=0
 wickets=0
 extras=0
-playing_batsman={"bat1":{"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"bat2":{"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}
-curr_bowler={"bowler":{"balls":0,"runs":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"by":0,"lb":0,"wb":0,"nb":0,"db":0}}
-s="bat1"
-ns="bat2"
+s=input("striker")
+ns=input("non-striker")
+playing_batsman={s:{"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},ns:{"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}
+print(playing_batsman)
+bowler_name = None
+bowler_input_done = False
+def handle_run_out():
+    pass
+def normal_dismissal(a):
+    pass
 def strikeRotate(s,ns,runs):
     if int(runs)%2!=0:
         #s,ns=ns,s
@@ -35,13 +42,19 @@ def wicketornot(x,b):
     if x=="fh" and (b=="ro" or b=="obs" or b=="hw"): # in fh these 3cases are out
         return True
     return False
+#bowler_name=input("enter bowlers name")
+#curr_bowler[bowler_name]={"balls":0,"runs":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"by":0,"lb":0,"wb":0,"nb":0,"db":0}
 while balls: #if there is a ball it has too be bowled
+    if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
+        bowler_name = input("Enter bowler's name:")
+        if bowler_name not in bowlers:
+            bowlers[bowler_name] = {"balls": 0, "runs": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0,"wk": 0, "by": 0, "lb": 0, "wb": 0, "nb": 0, "db": 0}
+            bowler_input_done = True
     curr_playing_batsman=playing_batsman
-    curr_bowling_bowler=curr_bowler
     c=(tballs-balls)%6+1 # just to ask input score for each ball
     inputscene=input("enter score of {} ball".format(c)) #scenaio when ball is bowled
     x=inputScenario(inputscene) # to get correct scenario
-    if x=="wb" or x=="nb" or x=="by" or x=="lb": #runs can be scored even in illegal balls
+    '''if x=="wb" or x=="nb" or x=="by" or x=="lb": #runs can be scored even in illegal balls
         extra_in_illegal_ball=input("enter extra scenario") #what happened in illegal ball
         if extra_in_illegal_ball=="wk": #if wicket in illegal delivery,only in some cases its out
             wicketruns=input("runs before wicket") #may score runs before getting out
@@ -61,13 +74,30 @@ while balls: #if there is a ball it has too be bowled
             scoreFreq[x]+=1 #update score freq
             scoreFreq[extra_runs]+=1 #update score freq
             total+=score[extra_runs]+score[x] #update total
-            scoreMap[x]+=score[x]+score[extra_runs] #update score map
-        if (x=="by" or x=="lb"):
-            balls-=1
-        print("balls",balls)
+            scoreMap[x]+=score[x]+score[extra_runs] #update score map'''
+    if x=="wb" or x=="nb":
+        extra_in_illegal_ball = input("enter extra scenario")
+        extra_runs = inputScenario(extra_in_illegal_ball)  # extra runs in illegal ball
+        scoreFreq[x] += 1  # update score freq
+        scoreFreq[extra_runs] += 1  # update score freq
+        total += score[extra_runs] + score[x]  # update total
+        scoreMap[x] += score[x] + score[extra_runs]  # update score map
+    elif x=="by" or x=="lb":
+        extra_runs=input("enter runs in by or legbyes")
+        scoreFreq[x] += 1  # update score freq
+        scoreFreq[extra_runs] += 1  # update score freq
+        total += score[extra_runs] + score[x]  # update total
+        scoreMap[x] += score[x] + score[extra_runs]  # update score map
+        balls-=1
+        s,ns=strikeRotate(s,ns,extra_runs)
+        print(total)
+        print(scoreMap)
+        print(scoreFreq)
+        print("balls", balls)
     elif x=="wk":
         typeofw=input("type of dis")
-        total += score[x]
+        scenario_while_wicket=input("enter runs while wicket")
+        total += score[x]+score[scenario_while_wicket]
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
         wicketFreq[typeofw] += 1
@@ -81,9 +111,9 @@ while balls: #if there is a ball it has too be bowled
         curr_playing_batsman[s][x] += 1
         s,ns=strikeRotate(s,ns,x)
         #updatin bowler's
-        curr_bowling_bowler["bowler"][x]+=1
-        curr_bowling_bowler["bowler"]["balls"]+=1
-        curr_bowling_bowler["bowler"]["runs"]+=score[x]
+        bowlers[bowler_name][x]+=1
+        bowlers[bowler_name]["balls"]+=1
+        bowlers[bowler_name]["runs"]+=score[x]
         #updatin total team's
         total+=score[x]
         scoreFreq[x] += 1
@@ -95,18 +125,20 @@ while balls: #if there is a ball it has too be bowled
         print(scoreMap)
         print(scoreFreq)
         print(balls)'''
-    if c == 6:  # if c is 0, it means the over is complete
+    if c == 6:  # if c is 6, it means the over is complete
         s,ns=strikeRotate(s,ns,x)
-        print(s,ns)
-        print(curr_playing_batsman)
+        bowler_input_done = False
+        #print(s,ns)
+        #print(curr_playing_batsman)
         over_count += 1  # increment the over count
+
         '''print(f"End of over {over_count}:")
         print(f"Total Score: {total}, Wickets: {wickets}, Extras: {extras}")
         print(f"Score Frequency: {scoreFreq}")
         print(f"Wicket Frequency: {wicketFreq}")
         print(f"Balls Remaining: {balls}")'''
 
-
+print(bowlers)
 
 '''print(total)
         print(scoreMap)
