@@ -17,8 +17,8 @@ wickets=0
 extras=0
 s=input("striker")
 ns=input("non-striker")
-playing_batsman={s:{"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},ns:{"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}
-print(playing_batsman)
+playing_batsman={s:{"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},ns:{"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}
+bastman_reset={"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
 bowler_name = None
 bowler_input_done = False
 def handle_run_out():
@@ -42,8 +42,6 @@ def wicketornot(x,b):
     if x=="fh" and (b=="ro" or b=="obs" or b=="hw"): # in fh these 3cases are out
         return True
     return False
-#bowler_name=input("enter bowlers name")
-#curr_bowler[bowler_name]={"balls":0,"runs":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"by":0,"lb":0,"wb":0,"nb":0,"db":0}
 while balls: #if there is a ball it has too be bowled
     if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
         bowler_name = input("Enter bowler's name:")
@@ -104,6 +102,7 @@ while balls: #if there is a ball it has too be bowled
     else: # from 1-6
         #updatin batsman's
         curr_playing_batsman[s]["balls"]+=1
+        curr_playing_batsman[s]["score"]+=score[x]
         curr_playing_batsman[s][x] += 1
         s,ns=strikeRotate(s,ns,x)
         #updatin bowler's
@@ -115,12 +114,6 @@ while balls: #if there is a ball it has too be bowled
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
         balls -= 1
-        '''print(curr_playing_batsman)
-        print(s, ns)
-        print(total)
-        print(scoreMap)
-        print(scoreFreq)
-        print(balls)'''
     if c == 6:  # if c is 6, it means the over is complete
         s,ns=strikeRotate(s,ns,x)
         bowler_input_done = False
@@ -128,13 +121,6 @@ while balls: #if there is a ball it has too be bowled
         #print(curr_playing_batsman)
         over_count += 1  # increment the over count
 
-        '''print(f"End of over {over_count}:")
-        print(f"Total Score: {total}, Wickets: {wickets}, Extras: {extras}")
-        print(f"Score Frequency: {scoreFreq}")
-        print(f"Wicket Frequency: {wicketFreq}")
-        print(f"Balls Remaining: {balls}")'''
-
-print(bowlers)
 
 '''print(total)
         print(scoreMap)
