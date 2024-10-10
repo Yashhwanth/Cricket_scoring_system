@@ -1,9 +1,8 @@
 overs=int(input("no of overs to be played"))
-balls=overs
+balls=overs*6
 over_count=0
 tballs=balls
 batsmans={}
-batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
 bowlers={}
 bowlsmap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":1,"db":0,"wk":0,"by":0,"lb":0}
 score={"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"wb":1,"nb":1,"db":0,"wk":0,"by":0,"lb":0,"stm":0}
@@ -11,18 +10,19 @@ scoreFreq={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":0,"db":0,"wk":0
 wicketsMap={"b":"bowled","c":"caught","lbw":"lbw","c&b":"caught&bowled","ro":"runout","stm":"stumped","hw":"hitwicket","hb":"handled the ball","obs":"obstructing the feild","to":"timedout","rtdo":"retired out"}
 wicketFreq={"b":0,"c":0,"lbw":0,"c&b":0,"ro":0,"stm":0,"hw":0,"hb":0,"obs":0,"to":0,"rtdo":0}
 scoreMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"wb":0,"nb":0,"by":0,"lb":0,"rtd":0}
-batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
+#batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
 total=0
 wickets=0
 extras=0
-playing_batsman={"bat1":0,"bat2":0}
+playing_batsman={"bat1":{"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},"bat2":{"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}
+curr_bowler={"bowler":{"balls":0,"runs":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"by":0,"lb":0,"wb":0,"nb":0,"db":0}}
 s="bat1"
 ns="bat2"
 def strikeRotate(s,ns,runs):
     if int(runs)%2!=0:
-        s,ns=ns,s
-        return s,ns
-    return ns,s
+        #s,ns=ns,s
+        return ns,s
+    return s,ns
 def inputScenario(a): # function to get the scenario present in corr. maps
     while a not in score:
         a = input("re enter")
@@ -36,8 +36,8 @@ def wicketornot(x,b):
         return True
     return False
 while balls: #if there is a ball it has too be bowled
-
     curr_playing_batsman=playing_batsman
+    curr_bowling_bowler=curr_bowler
     c=(tballs-balls)%6+1 # just to ask input score for each ball
     inputscene=input("enter score of {} ball".format(c)) #scenaio when ball is bowled
     x=inputScenario(inputscene) # to get correct scenario
@@ -73,19 +73,30 @@ while balls: #if there is a ball it has too be bowled
         wicketFreq[typeofw] += 1
         balls-=1
     elif x=="db":
-        pass
-    else:      # from 1-6
-        batsmanMap[x]+=1
-        curr_playing_batsman[s]+=score[x]
+        curr_bowling_bowler["bowler"][x] += 1
+        print(curr_bowling_bowler)
+    else: # from 1-6
+        #updatin batsman's
+        curr_playing_batsman[s]["balls"]+=1
+        curr_playing_batsman[s][x] += 1
         s,ns=strikeRotate(s,ns,x)
-        print(curr_playing_batsman)
-        print(s,ns)
+        #updatin bowler's
+        curr_bowling_bowler["bowler"][x]+=1
+        curr_bowling_bowler["bowler"]["balls"]+=1
+        curr_bowling_bowler["bowler"]["runs"]+=score[x]
+        #updatin total team's
         total+=score[x]
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
         balls -= 1
+        '''print(curr_playing_batsman)
+        print(s, ns)
+        print(total)
+        print(scoreMap)
+        print(scoreFreq)
+        print(balls)'''
     if c == 6:  # if c is 0, it means the over is complete
-        s,ns=strikeRotate(s,ns,0)
+        s,ns=strikeRotate(s,ns,x)
         print(s,ns)
         print(curr_playing_batsman)
         over_count += 1  # increment the over count
