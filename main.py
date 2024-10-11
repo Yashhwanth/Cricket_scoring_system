@@ -27,7 +27,6 @@ def normal_dismissal(a):
     pass
 def strikeRotate(s,ns,runs):
     if int(runs)%2!=0:
-        #s,ns=ns,s
         return ns,s
     return s,ns
 def inputScenario(a): # function to get the scenario present in corr. maps
@@ -52,40 +51,33 @@ while balls: #if there is a ball it has too be bowled
     c=(tballs-balls)%6+1 # just to ask input score for each ball
     inputscene=input("enter score of {} ball".format(c)) #scenaio when ball is bowled
     x=inputScenario(inputscene) # to get correct scenario
-    '''if x=="wb" or x=="nb" or x=="by" or x=="lb": #runs can be scored even in illegal balls
-        extra_in_illegal_ball=input("enter extra scenario") #what happened in illegal ball
-        if extra_in_illegal_ball=="wk": #if wicket in illegal delivery,only in some cases its out
-            wicketruns=input("runs before wicket") #may score runs before getting out
-            wickettype=input("type of wicket") # get wicket type
-            if wicketornot(x,wickettype): #function to check whether its an out in illegaal ball or not
-                wickets+=1 #if its out then increase wickets
-                total += score[x]+score[wicketruns] #update score
-                striker=strikeRotate(s,ns,wicketruns)
-                curr_playing_batsman[s]+=score[wicketruns]
-                print(curr_playing_batsman)
-                scoreFreq[x] += 1 #update score freq
-                scoreFreq[wicketruns] += 1 #update score freq
-                scoreMap[x] += score[x]+score[wicketruns] #update score map
-                wicketFreq[wickettype]+=1 #update wicket freq
-        else: #if its not out in illegal ball,still score can be scored
-            extra_runs=inputScenario(extra_in_illegal_ball) #extra runs in illegal ball
-            scoreFreq[x]+=1 #update score freq
-            scoreFreq[extra_runs]+=1 #update score freq
-            total+=score[extra_runs]+score[x] #update total
-            scoreMap[x]+=score[x]+score[extra_runs] #update score map'''
     if x=="wb" or x=="nb":
-        extra_in_illegal_ball = input("enter extra scenario")
-        extra_runs = inputScenario(extra_in_illegal_ball)  # extra runs in illegal ball
+        extra_in_wide = input("enter extra scenario")
+        extra_runs = inputScenario(extra_in_wide) # extra runs in wide ball
+        s,ns=strikeRotate(s,ns,extra_runs)
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         total += score[extra_runs] + score[x]  # update total
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
+        bowlers[bowler_name][x] += 1
+        bowlers[bowler_name][extra_runs]+=1
+        bowlers[bowler_name]["runs"] += score[x]+score[extra_runs]
+        extras+=score[x]+score[extra_runs]
+        print(total)
+        print(scoreMap)
+        print(scoreFreq)
+        print(wicketFreq)
+        print("balls", balls)
+        print(curr_playing_batsman)
+        print(bowler_name,":",bowlers[bowler_name])
+        print(extras)
     elif x=="by" or x=="lb":
         extra_runs=input("enter runs in by or legbyes")
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         total += score[extra_runs] + score[x]  # update total
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
+        extras+=score[x]+score[extra_runs]
         balls-=1
         s,ns=strikeRotate(s,ns,extra_runs)
     elif x=="db":
@@ -114,7 +106,7 @@ while balls: #if there is a ball it has too be bowled
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
         balls -= 1
-    if c == 6:  # if c is 6, it means the over is complete
+    if (tballs - balls) % 6 == 0:  # if c is 6, it means the over is complete
         s,ns=strikeRotate(s,ns,x)
         bowler_input_done = False
         #print(s,ns)
