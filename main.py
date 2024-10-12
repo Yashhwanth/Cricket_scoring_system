@@ -7,13 +7,13 @@ wickets=0
 extras=0
 batsmans={}
 #batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
-bastman_reset={"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
+bastman_reset={"score":0,"balls":0,"diss":"","0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
 s=input("striker")
 ns=input("non-striker")
 batsmans[s]=bastman_reset
 batsmans[ns]=bastman_reset
 playing_batsman={s:{"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},ns:{"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}
-
+#playing_batsman={s:bastman_reset,ns:bastman_reset}
 bowlers={}
 bowler_name = None
 bowler_input_done = False
@@ -80,40 +80,40 @@ while balls: #if there is a ball it has too be bowled
         bowlers[bowler_name][x] += 1
         bowlers[bowler_name][extra_runs] += 1
         bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]
+        total += score[extra_runs] + score[x]  # update total
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
-        total += score[extra_runs] + score[x]  # update total
         extras+=score[x]+score[extra_runs]
     elif x=="nb":
         extra_in_wide = input("enter extra scenario")
         extra_runs = inputScenario(extra_in_wide) # extra runs in wide ball
-        #curr_playing_batsman[s]["balls"] += 1
         curr_playing_batsman[s]["score"] += score[extra_runs]
         curr_playing_batsman[s][extra_runs] += 1
         s, ns = strikeRotate(s, ns, extra_runs)
         bowlers[bowler_name][x] += 1
         bowlers[bowler_name][extra_runs] += 1
         bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]
+        total += score[extra_runs] + score[x]  # update total
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
-        total += score[extra_runs] + score[x]  # update total
         extras+=score[x]+score[extra_runs]
-        print(curr_playing_batsman)
     elif x=="db":
         bowlers[bowler_name][x]+=1
         scoreFreq[x]+=1
     elif x=="by" or x=="lb":
         extra_runs=input("enter runs in by or legbyes")
+        curr_playing_batsman[s]["balls"] += 1
         s, ns = strikeRotate(s, ns, extra_runs)
         bowlers[bowler_name][x] += 1
         bowlers[bowler_name][extra_runs] += 1
+        bowlers[bowler_name]["balls"]+=1
         bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]
+        total += score[extra_runs] + score[x]  # update total
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
-        total += score[extra_runs] + score[x]  # update total
         extras+=score[x]+score[extra_runs]
         balls-=1
     elif x=="wk":
@@ -161,7 +161,7 @@ while balls: #if there is a ball it has too be bowled
 
             wicketFreq[type_of_w] += 1
 
-        elif type_of_ball=="lb" or type_of_ball=="b":
+        elif type_of_ball=="lb" or type_of_ball=="by":
             curr_playing_batsman[s]["balls"] += 1
             # curr_playing_batsman[s][extra_runs] += 1
             # curr_playing_batsman[s]["score"] += score[x]
@@ -200,6 +200,7 @@ while balls: #if there is a ball it has too be bowled
             balls -= 1
 
             wicketFreq[type_of_w] += 1
+        batsmans[out_batsman]["diss"]=type_of_w
     else :
         curr_playing_batsman[s]["balls"]+=1
         curr_playing_batsman[s]["score"]+=score[x]
