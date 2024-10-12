@@ -7,10 +7,12 @@ wickets=0
 extras=0
 batsmans={}
 #batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
+bastman_reset={"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
 s=input("striker")
 ns=input("non-striker")
+batsmans[s]=bastman_reset
+batsmans[ns]=bastman_reset
 playing_batsman={s:{"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0},ns:{"score":0,"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}}
-bastman_reset={"balls":0,"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
 
 bowlers={}
 bowler_name = None
@@ -18,25 +20,30 @@ bowler_input_done = False
 bowlsmap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":1,"db":0,"wk":0,"by":0,"lb":0}
 
 score={"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"wb":1,"nb":1,"db":0,"wk":0,"by":0,"lb":0,"stm":0}
+scoreMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"wb":0,"nb":0,"by":0,"lb":0,"rtd":0,"db":0}
 scoreFreq={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":0,"db":0,"wk":0,"by":0,"lb":0,"rtd":0}
 
 wicketsMap={"b":"bowled","c":"caught","lbw":"lbw","c&b":"caught&bowled","ro":"runout","stm":"stumped","hw":"hitwicket","hb":"handled the ball","obs":"obstructing the feild","to":"timedout","rtdo":"retired out"}
 wicketFreq={"b":0,"c":0,"lbw":0,"c&b":0,"ro":0,"stm":0,"hw":0,"hb":0,"obs":0,"to":0,"rtdo":0}
-scoreMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"wb":0,"nb":0,"by":0,"lb":0,"rtd":0,"db":0}
+
 
 def striker_resetting(out_batsman,out_end):
     global s,ns,curr_playing_batsman
     del curr_playing_batsman[out_batsman]
     new_batsman_name = input("Enter the new batsman's name: ")
+    batsmans[new_batsman_name]=bastman_reset
     curr_playing_batsman[new_batsman_name] = {"score":0,"balls": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0}
     if out_end=="s":
         #del curr_playing_batsman[s]
         #curr_playing_batsman[new_batsman_name] = {"balls":0,"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0,"6": 0}  # Reset stats
+        ns=s
         s = new_batsman_name
     elif out_end=="ns":
         #del curr_playing_batsman[s]
         #curr_playing_batsman[new_batsman_name] = {"balls": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0,"6": 0}  # Reset stats
+        s=ns
         ns = new_batsman_name
+    return s,ns
 def teams_stats_while_wicket(x,extra_runs,type_of_ball):
     global total,scoreFreq,scoreMap
     total += score[x] + score[extra_runs] + score[type_of_ball]
@@ -110,43 +117,20 @@ while balls: #if there is a ball it has too be bowled
         extras+=score[x]+score[extra_runs]
         balls-=1
     elif x=="wk":
+        wickets+=1
         extra_runs=input("runs in wicket ball")
         type_of_ball=input("enter type of ball-n/nb/wb/lb/b")
         out_batsman=input("mention out bs name")
         out_end=input("enter s/ns")
         type_of_w = input("type of dis")
-        if type_of_ball in ["0","1","2","3","4","5","6"]:
-            type_of_ball='0'
-            curr_playing_batsman[s]["balls"] += 1
-            curr_playing_batsman[s]["score"] += score[x]+score[extra_runs]
+        if type_of_ball=="nb":
+            #curr_playing_batsman[s]["balls"] += 1
             curr_playing_batsman[s][extra_runs] += 1
-            batsmans[out_batsman]=curr_playing_batsman[out_batsman]
-            striker_resetting(out_batsman, out_end)
-            '''if out_batsman == "s":
-                del curr_playing_batsman[s]
-                curr_playing_batsman[new_batsman_name] = {"balls": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0,"6": 0}  # Reset stats
-                s = new_batsman_name
-                if out_end == "ns":
-                    s, ns = ns, s
-            elif out_batsman == "ns":
-                del curr_playing_batsman[s]
-                curr_playing_batsman[new_batsman_name] = {"balls": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0,"6": 0}  # Reset stats
-                s = new_batsman_name
-                if out_end == "s":
-                    s, ns = ns, s'''
-            bowlers[bowler_name][x] += 1
-            bowlers[bowler_name]["balls"] += 1
-            bowlers[bowler_name][extra_runs] += 1
-            bowlers[bowler_name][type_of_ball] += 1
-            bowlers[bowler_name]["runs"] += score[x]+score[extra_runs]+score[type_of_ball]
-            #teams
-            teams_stats_while_wicket(x,extra_runs,type_of_ball)
-            balls -= 1
-        elif type_of_ball=="nb":
             curr_playing_batsman[s]["score"] += score[x]+score[extra_runs]
-            curr_playing_batsman[s][extra_runs] += 1
+
             batsmans[out_batsman] = curr_playing_batsman[out_batsman]
             striker_resetting(out_batsman, out_end)
+
             #bowlers[bowler_name][x] += 1
             #bowlers[bowler_name]["balls"] += 1
             bowlers[bowler_name][extra_runs] += 1
@@ -155,17 +139,17 @@ while balls: #if there is a ball it has too be bowled
             #teams
             teams_stats_while_wicket(x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
-            '''total += score[x] + score[extra_runs]+score[type_of_ball]
-            scoreFreq[x] += 1
-            scoreFreq[extra_runs] += 1
-            scoreFreq[type_of_ball] += 1
-            scoreMap[extra_runs] += score[extra_runs]
-            scoreMap[type_of_ball] += score[type_of_ball]'''
+
+            wicketFreq[type_of_w]+=1
+
         elif type_of_ball=="wb":
+            #curr_playing_batsman[s]["balls"] += 1
+            # curr_playing_batsman[s][extra_runs] += 1
             #curr_playing_batsman[s]["score"] += score[x]
-            #curr_playing_batsman[s][extra_runs] += 1
+
             batsmans[out_batsman] = curr_playing_batsman[out_batsman]
             striker_resetting(out_batsman, out_end)
+
             #bowlers[bowler_name][x] += 1
             #bowlers[bowler_name]["balls"] += 1
             bowlers[bowler_name][extra_runs] += 1
@@ -174,18 +158,17 @@ while balls: #if there is a ball it has too be bowled
             # teams
             teams_stats_while_wicket(x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
-            '''total += score[x] + score[extra_runs] + score[type_of_ball]
-            scoreFreq[x] += 1
-            scoreFreq[extra_runs] += 1
-            scoreFreq[type_of_ball] += 1
-            scoreMap[extra_runs] += score[extra_runs]
-            scoreMap[type_of_ball] += score[type_of_ball]'''
+
+            wicketFreq[type_of_w] += 1
+
         elif type_of_ball=="lb" or type_of_ball=="b":
             curr_playing_batsman[s]["balls"] += 1
-            #curr_playing_batsman[s]["score"] += score[x]
-            #curr_playing_batsman[s][extra_runs] += 1
+            # curr_playing_batsman[s][extra_runs] += 1
+            # curr_playing_batsman[s]["score"] += score[x]
+
             batsmans[out_batsman] = curr_playing_batsman[out_batsman]
             striker_resetting(out_batsman, out_end)
+
             #bowlers[bowler_name][x] += 1
             bowlers[bowler_name]["balls"] += 1
             bowlers[bowler_name][extra_runs] += 1
@@ -194,15 +177,29 @@ while balls: #if there is a ball it has too be bowled
             # teams
             teams_stats_while_wicket(x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
-            '''total += score[x] + score[extra_runs] + score[type_of_ball]
-            scoreFreq[x] += 1
-            scoreFreq[extra_runs] += 1
-            scoreFreq[type_of_ball] += 1
-            scoreMap[extra_runs] += score[extra_runs]
-            scoreMap[type_of_ball] += score[type_of_ball]'''
-            balls-=1
+            balls -= 1
+
+            wicketFreq[type_of_w] += 1
+
         else:
-            pass
+            type_of_ball = '0'
+            curr_playing_batsman[s]["balls"] += 1
+            curr_playing_batsman[s][extra_runs] += 1
+            curr_playing_batsman[s]["score"] += score[x] + score[extra_runs]
+
+            batsmans[out_batsman] = curr_playing_batsman[out_batsman]
+            striker_resetting(out_batsman, out_end)
+
+            bowlers[bowler_name][x] += 1
+            bowlers[bowler_name]["balls"] += 1
+            bowlers[bowler_name][extra_runs] += 1
+            bowlers[bowler_name][type_of_ball] += 1
+            bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
+            # teams
+            teams_stats_while_wicket(x, extra_runs, type_of_ball)
+            balls -= 1
+
+            wicketFreq[type_of_w] += 1
     else :
         curr_playing_batsman[s]["balls"]+=1
         curr_playing_batsman[s]["score"]+=score[x]
@@ -217,6 +214,7 @@ while balls: #if there is a ball it has too be bowled
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
         balls -= 1
+    batsmans[s]=curr_playing_batsman[s]
     if (tballs - balls) % 6 == 6:  # if c is 6, it means the over is complete
         s,ns=strikeRotate(s,ns,x)
         bowler_input_done = False
