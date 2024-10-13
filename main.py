@@ -5,6 +5,7 @@ over_count=0
 total=0
 wickets=0
 extras=0
+overs_runs=0
 
 batsmans={}
 #batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
@@ -68,7 +69,7 @@ def teams_stats_while_wicket(x,extra_runs,type_of_ball):
     scoreFreq[type_of_ball] += 1
     scoreMap[extra_runs] += score[extra_runs]
     scoreMap[type_of_ball] += score[type_of_ball]
-def strikeRotate(s,ns,runs):
+def strikeRotate(s,ns,runs="1"):
     if int(runs)%2!=0:
         return ns,s
     return s,ns
@@ -77,11 +78,11 @@ def inputScenario(a): # function to get the scenario present in corr. maps
         a = input("re enter")
     return a
 while balls: #if there is a ball it has too be bowled
-    print((tballs - balls) % 6 )
+    #print((tballs - balls) % 6)
     if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
         bowler_name = input("Enter bowler's name:")
         if bowler_name not in bowlers:
-            bowlers[bowler_name] = {"balls": 0, "runs": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0,"wk": 0, "by": 0, "lb": 0, "wb": 0, "nb": 0, "db": 0}
+            bowlers[bowler_name] = {"maidens":0, "balls": 0, "runs": 0,"economy":0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0,"wk": 0, "by": 0, "lb": 0, "wb": 0, "nb": 0, "db": 0}
             bowler_input_done = True
     curr_playing_batsman=playing_batsman
     c=(tballs-balls)%6+1 # just to ask input score for each ball
@@ -200,7 +201,6 @@ while balls: #if there is a ball it has too be bowled
             teams_stats_while_wicket(x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
             balls -= 1
-
             wicketFreq[type_of_w] += 1
         else:
             type_of_ball = '0'
@@ -220,7 +220,6 @@ while balls: #if there is a ball it has too be bowled
             # teams
             teams_stats_while_wicket(x, extra_runs, type_of_ball)
             balls -= 1
-
             wicketFreq[type_of_w] += 1
         batsmans[out_batsman]["diss"]=type_of_w
     else :
@@ -239,23 +238,3 @@ while balls: #if there is a ball it has too be bowled
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
         balls -= 1
-    #batsmans[s] = curr_playing_batsman[s]
-    if (tballs - balls) % 6 == 5:  # if c is 6, it means the over is complete
-        s,ns=strikeRotate(s,ns,x)
-        bowler_input_done = False
-        over_count += 1  # increment the over count
-    '''print(batsmans)
-    print(curr_playing_batsman)
-    print(total)
-    print(scoreMap)
-    print(scoreFreq)
-    print(partnerships)'''
-    print(bowlers)
-
-
-'''print(total)
-        print(scoreMap)
-        print(scoreFreq)
-        print(wicketFreq)
-        print("balls",balls)'''
-
