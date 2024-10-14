@@ -30,18 +30,18 @@ scoreFreq={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":0,"db":0,"wk":0
 wicketsMap={"b":"bowled","c":"caught","lbw":"lbw","c&b":"caught&bowled","ro":"runout","stm":"stumped","hw":"hitwicket","hb":"handled the ball","obs":"obstructing the feild","to":"timedout","rtdo":"retired out"}
 wicketFreq={"b":0,"c":0,"lbw":0,"c&b":0,"ro":0,"stm":0,"hw":0,"hb":0,"obs":0,"to":0,"rtdo":0}
 
-def update_partnership(striker, non_striker, runs,extra_runs="0",type_of_ball="0"):
+def update_partnership(striker, non_striker, runs, score, partnerships,type_of_ball="0"):
     # Create a sorted tuple for the partnership
-    global partnerships,x
+    #global partnerships,x
     key = tuple(sorted((striker, non_striker)))
     # Initialize the partnership if it doesn't exist
     if key not in partnerships:
         partnerships[key] = 0
     # Update the partnership score
-    partnerships[key] += score[runs]+score[extra_runs]+score[type_of_ball]
+    partnerships[key] += score[runs]+score[type_of_ball]
     return partnerships
-def striker_resetting(out_batsman,out_end):
-    global s,ns,curr_playing_batsman,partnerships
+def striker_resetting(out_batsman,out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset):
+    #global s,ns,curr_playing_batsman,partnerships
     del curr_playing_batsman[out_batsman]
     new_batsman_name = input("Enter the new batsman's name: ")
     batsmans[new_batsman_name]=bastman_reset
@@ -60,15 +60,16 @@ def striker_resetting(out_batsman,out_end):
         elif out_end=="ns":
             s=s
             ns = new_batsman_name
-    return s,ns
-def teams_stats_while_wicket(x,extra_runs,type_of_ball):
-    global total,scoreFreq,scoreMap
+    return s,ns,curr_playing_batsman,batsmans
+def teams_stats_while_wicket(total,scoreFreq,scoreMap,x,extra_runs,type_of_ball):
+    #global total,scoreFreq,scoreMap
     total += score[x] + score[extra_runs] + score[type_of_ball]
     scoreFreq[x] += 1
     scoreFreq[extra_runs] += 1
     scoreFreq[type_of_ball] += 1
     scoreMap[extra_runs] += score[extra_runs]
     scoreMap[type_of_ball] += score[type_of_ball]
+    return total,scoreFreq,scoreMap
 def strikeRotate(s,ns,runs="1"):
     if int(runs)%2!=0:
         return ns,s
@@ -107,7 +108,7 @@ while balls: #if there is a ball it has too be bowled
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
         extras+=score[x]+score[extra_runs]
-        update_partnership(s,ns,x,extra_runs)
+        partnerships=update_partnership(s,ns,extra_runs,score,partnerships,x)
     elif x=="nb":
         extra_in_wide = input("enter extra scenario")
         extra_runs = inputScenario(extra_in_wide) # extra runs in wide ball
@@ -123,7 +124,7 @@ while balls: #if there is a ball it has too be bowled
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
         extras+=score[x]+score[extra_runs]
-        update_partnership(s,ns,x,extra_runs)
+        partnerships=update_partnership(s,ns,extra_runs,score,partnerships,x)
     elif x=="db":
         bowlers[bowler_name][x]+=1
         scoreFreq[x]+=1
@@ -143,7 +144,7 @@ while balls: #if there is a ball it has too be bowled
         extras+=score[x]+score[extra_runs]
         s,ns,bowler_input_done,over_count=over_ending(tballs, balls, bowler_input_done, over_count)
         balls-=1
-        update_partnership(s,ns,x,extra_runs)
+        partnerships=update_partnership(s,ns,extra_runs,score,partnerships,x)
     elif x=="wk":
         wickets+=1
         extra_runs=input("runs in wicket ball")
@@ -157,8 +158,9 @@ while balls: #if there is a ball it has too be bowled
             curr_playing_batsman[s]["score"] += score[x]+score[extra_runs]
             batsmans[out_batsman] = curr_playing_batsman[out_batsman]
             batsmans[s] = curr_playing_batsman[s]
-            striker_resetting(out_batsman, out_end)
-            update_partnership(s, ns, x, extra_runs,type_of_ball)
+            partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
+            s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+            #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
 
 
             #bowlers[bowler_name][x] += 1
@@ -167,7 +169,7 @@ while balls: #if there is a ball it has too be bowled
             bowlers[bowler_name][type_of_ball] += 1
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]+score[type_of_ball]
             #teams
-            teams_stats_while_wicket(x, extra_runs, type_of_ball)
+            total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
 
             wicketFreq[type_of_w]+=1
@@ -177,16 +179,16 @@ while balls: #if there is a ball it has too be bowled
             #curr_playing_batsman[s]["score"] += score[x]
             batsmans[s] = curr_playing_batsman[s]
             batsmans[out_batsman] = curr_playing_batsman[out_batsman]
-
-            striker_resetting(out_batsman, out_end)
-            update_partnership(s, ns, x, extra_runs,type_of_ball)
+            partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
+            s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+            #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
             #bowlers[bowler_name][x] += 1
             #bowlers[bowler_name]["balls"] += 1
             bowlers[bowler_name][extra_runs] += 1
             bowlers[bowler_name][type_of_ball] += 1
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
             # teams
-            teams_stats_while_wicket(x, extra_runs, type_of_ball)
+            total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
 
             wicketFreq[type_of_w] += 1
@@ -196,16 +198,16 @@ while balls: #if there is a ball it has too be bowled
             # curr_playing_batsman[s]["score"] += score[x]
             batsmans[s] = curr_playing_batsman[s]
             batsmans[out_batsman] = curr_playing_batsman[out_batsman]
-
-            striker_resetting(out_batsman, out_end)
-            update_partnership(s, ns, x, extra_runs,type_of_ball)
+            partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
+            s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+            #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
             #bowlers[bowler_name][x] += 1
             bowlers[bowler_name]["balls"] += 1
             #bowlers[bowler_name][extra_runs] += 1
             bowlers[bowler_name][type_of_ball] += 1
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
             # teams
-            teams_stats_while_wicket(x, extra_runs, type_of_ball)
+            total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
             s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
             balls -= 1
@@ -218,15 +220,16 @@ while balls: #if there is a ball it has too be bowled
             batsmans[s] = curr_playing_batsman[s]
             batsmans[out_batsman] = curr_playing_batsman[out_batsman]
             #update_partnership(s, ns, x, extra_runs)
-            striker_resetting(out_batsman, out_end)
-            update_partnership(s, ns, x, extra_runs,type_of_ball)
+            partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
+            s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+            #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
             bowlers[bowler_name][x] += 1
             bowlers[bowler_name]["balls"] += 1
             bowlers[bowler_name][extra_runs] += 1
             bowlers[bowler_name][type_of_ball] += 1
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
             # teams
-            teams_stats_while_wicket(x, extra_runs, type_of_ball)
+            total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
             s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
             balls -= 1
             wicketFreq[type_of_w] += 1
@@ -236,7 +239,7 @@ while balls: #if there is a ball it has too be bowled
         curr_playing_batsman[s]["score"]+=score[x]
         curr_playing_batsman[s][x] += 1
         batsmans[s] = curr_playing_batsman[s]
-        update_partnership(s, ns, x, extra_runs="0")
+        partnerships=update_partnership(s,ns,x,score,partnerships)
         s,ns=strikeRotate(s,ns,x)
         #updatin bowler's
         bowlers[bowler_name][x]+=1
@@ -248,4 +251,4 @@ while balls: #if there is a ball it has too be bowled
         scoreMap[x]+=score[x]
         s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
         balls -= 1
-    print(s,ns)
+    print(partnerships)
