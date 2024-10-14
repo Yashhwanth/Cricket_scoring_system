@@ -77,6 +77,12 @@ def inputScenario(a): # function to get the scenario present in corr. maps
     while a not in score:
         a = input("re enter")
     return a
+def over_ending(tballs,balls,s,ns,bowler_input_done,over_count):
+    if (tballs - balls)%6==5:
+        s, ns = strikeRotate(s, ns)
+        bowler_input_done = False
+        over_count += 1
+    return s,ns,bowler_input_done,over_count
 while balls: #if there is a ball it has too be bowled
     #print((tballs - balls) % 6)
     if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
@@ -135,6 +141,7 @@ while balls: #if there is a ball it has too be bowled
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
         extras+=score[x]+score[extra_runs]
+        s,ns,bowler_input_done,over_count=over_ending(tballs, balls, bowler_input_done, over_count)
         balls-=1
         update_partnership(s,ns,x,extra_runs)
     elif x=="wk":
@@ -200,6 +207,7 @@ while balls: #if there is a ball it has too be bowled
             # teams
             teams_stats_while_wicket(x, extra_runs, type_of_ball)
             extras += score[type_of_ball]
+            s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
             balls -= 1
             wicketFreq[type_of_w] += 1
         else:
@@ -219,6 +227,7 @@ while balls: #if there is a ball it has too be bowled
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
             # teams
             teams_stats_while_wicket(x, extra_runs, type_of_ball)
+            s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
             balls -= 1
             wicketFreq[type_of_w] += 1
         batsmans[out_batsman]["diss"]=type_of_w
@@ -237,4 +246,6 @@ while balls: #if there is a ball it has too be bowled
         total+=score[x]
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
+        s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
         balls -= 1
+    print(s,ns)
