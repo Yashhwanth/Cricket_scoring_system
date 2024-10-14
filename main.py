@@ -6,6 +6,7 @@ total=0
 wickets=0
 extras=0
 overs_runs=0
+curr_runs=0
 
 batsmans={}
 #batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
@@ -78,22 +79,28 @@ def inputScenario(a): # function to get the scenario present in corr. maps
     while a not in score:
         a = input("re enter")
     return a
-def over_ending(tballs,balls,s,ns,bowler_input_done,over_count):
+def over_ending(tballs,balls,s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs):
     if (tballs - balls)%6==5:
         s, ns = strikeRotate(s, ns)
         bowler_input_done = False
         over_count += 1
-    return s,ns,bowler_input_done,over_count
+        bowlers, bowler_name, total, curr_runs=maiden_or_not(bowlers,bowler_name,total,curr_runs)
+    return s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs
+def maiden_or_not(bowlers,bowler_name,total,curr_runs):
+    if curr_runs==0:
+        bowlers[bowler_name]["maidens"]+=1
+    return bowlers,bowler_name,total,curr_runs
 while balls: #if there is a ball it has too be bowled
     #print((tballs - balls) % 6)
     if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
+        curr_runs=0
         bowler_name = input("Enter bowler's name:")
         if bowler_name not in bowlers:
             bowlers[bowler_name] = {"maidens":0, "balls": 0, "runs": 0,"economy":0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0,"wk": 0, "by": 0, "lb": 0, "wb": 0, "nb": 0, "db": 0}
             bowler_input_done = True
     curr_playing_batsman=playing_batsman
     c=(tballs-balls)%6+1 # just to ask input score for each ball
-    inputscene=input("enter score of {} ball".format(c)) #scenaio when ball is bowled
+    inputscene=input("enter score of {} ball".format((tballs-balls)%6+1)) #scenaio when ball is bowled
     x=inputScenario(inputscene) # to get correct scenario
     if x=="wb":
         extra_in_wide = input("enter extra scenario")
@@ -104,6 +111,7 @@ while balls: #if there is a ball it has too be bowled
         bowlers[bowler_name][extra_runs] += 1
         bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]
         total += score[extra_runs] + score[x]  # update total
+        curr_runs+=score[extra_runs] + score[x]
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
@@ -120,6 +128,7 @@ while balls: #if there is a ball it has too be bowled
         bowlers[bowler_name][extra_runs] += 1
         bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]
         total += score[extra_runs] + score[x]  # update total
+        curr_runs += score[extra_runs] + score[x]
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
@@ -138,11 +147,12 @@ while balls: #if there is a ball it has too be bowled
         bowlers[bowler_name]["balls"]+=1
         bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]
         total += score[extra_runs] + score[x]  # update total
+        curr_runs += score[extra_runs] + score[x]
         scoreFreq[x] += 1  # update score freq
         scoreFreq[extra_runs] += 1  # update score freq
         scoreMap[x] += score[x] + score[extra_runs]  # update score map
         extras+=score[x]+score[extra_runs]
-        s,ns,bowler_input_done,over_count=over_ending(tballs, balls, bowler_input_done, over_count)
+        s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
         balls-=1
         partnerships=update_partnership(s,ns,extra_runs,score,partnerships,x)
     elif x=="wk":
@@ -170,6 +180,7 @@ while balls: #if there is a ball it has too be bowled
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs]+score[type_of_ball]
             #teams
             total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
+            curr_runs += score[extra_runs] + score[x]
             extras += score[type_of_ball]
 
             wicketFreq[type_of_w]+=1
@@ -189,6 +200,7 @@ while balls: #if there is a ball it has too be bowled
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
             # teams
             total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
+            curr_runs += score[extra_runs] + score[x]
             extras += score[type_of_ball]
 
             wicketFreq[type_of_w] += 1
@@ -208,8 +220,9 @@ while balls: #if there is a ball it has too be bowled
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
             # teams
             total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
+            curr_runs += score[extra_runs] + score[x]
             extras += score[type_of_ball]
-            s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
+            s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
             balls -= 1
             wicketFreq[type_of_w] += 1
         else:
@@ -230,7 +243,8 @@ while balls: #if there is a ball it has too be bowled
             bowlers[bowler_name]["runs"] += score[x] + score[extra_runs] + score[type_of_ball]
             # teams
             total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
-            s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
+            curr_runs += score[extra_runs] + score[x]
+            s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
             balls -= 1
             wicketFreq[type_of_w] += 1
         batsmans[out_batsman]["diss"]=type_of_w
@@ -247,8 +261,11 @@ while balls: #if there is a ball it has too be bowled
         bowlers[bowler_name]["runs"]+=score[x]
         #updatin total team's
         total+=score[x]
+        curr_runs += score[x]
         scoreFreq[x] += 1
         scoreMap[x]+=score[x]
-        s,ns,bowler_input_done,over_count=over_ending(tballs, balls,s,ns, bowler_input_done, over_count)
+        s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
         balls -= 1
-    print(partnerships)
+    print("score:",total,"/",wickets)
+    print(bowlers)
+
