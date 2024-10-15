@@ -334,15 +334,6 @@ while balls: #if there is a ball it has too be bowled
     #print(state_stack)
     print(batsmans)
     #print("score:",total,"/",wickets)
-    while True:  # Inner loop for undo functionality
-        undo_choice = input("Do you want to undo the last ball? (y/n): ")
-        if undo_choice.lower() == 'y':
-            undo_last_ball()  # Undo the last ball's stats
-            #print("score:", total, "/", wickets)
-            print(batsmans)
-        else:
-            break  # Exit the undo loop if the user doesn't want to undo
-    #print("score:", total, "/", wickets)
-    print(batsmans)
+
 
 
