@@ -25,7 +25,7 @@ bowler_name = None
 bowler_input_done = False
 bowlsmap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":1,"db":0,"wk":0,"by":0,"lb":0}
 
-score={"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"wb":1,"nb":1,"db":0,"wk":0,"by":0,"lb":0,"stm":0}
+score={"0":0,"1":1,"2":2,"3":3,"4":4,"5":5,"6":6,"wb":1,"nb":1,"db":0,"wk":0,"by":0,"lb":0,"stm":0,"declare":0}
 scoreMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wk":0,"wb":0,"nb":0,"by":0,"lb":0,"rtd":0,"db":0}
 scoreFreq={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"wb":0,"nb":0,"db":0,"wk":0,"by":0,"lb":0,"rtd":0}
 
@@ -165,6 +165,10 @@ while balls: #if there is a ball it has too be bowled
     c=(tballs-balls)%6+1 # just to ask input score for each ball
     inputscene=input("enter score of {} ball".format((tballs-balls)%6+1)) #scenaio when ball is bowled
     x=inputScenario(inputscene) # to get correct scenario
+    if x=="declare":
+        target=total+1
+        print(total)
+        break
     if x=="wb":
         extra_in_wide = input("enter extra scenario")
         extra_runs = inputScenario(extra_in_wide) # extra runs in wide ball
@@ -332,17 +336,17 @@ while balls: #if there is a ball it has too be bowled
 
         balls -= 1
     #print(state_stack)
-    print(batsmans)
+    print(bowlers)
     #print("score:",total,"/",wickets)
     while True:  # Inner loop for undo functionality
         undo_choice = input("Do you want to undo the last ball? (y/n): ")
         if undo_choice.lower() == 'y':
             undo_last_ball()  # Undo the last ball's stats
             #print("score:", total, "/", wickets)
-            print(batsmans)
+            print(bowlers)
         else:
             break  # Exit the undo loop if the user doesn't want to undo
     #print("score:", total, "/", wickets)
-    print(batsmans)
+    print(bowlers)
 
 
