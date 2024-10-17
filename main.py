@@ -5,6 +5,7 @@ def innings():
     overs = int(input("no of overs to be played"))
     balls = overs * 6
     tballs = balls
+    played_balls=0
     over_count = 0
     total = 0
     wickets = 0
@@ -49,6 +50,7 @@ def innings():
     def save_state():
         #state_stack
         state = {
+            "played_balls":played_balls,
             "balls": balls,
             "tballs": tballs,
             "over_count": over_count,
@@ -72,20 +74,22 @@ def innings():
         }
         state_stack.append(state)
 
-    def undo_last_ball():
+    def undo_last_ball(a):
         print("hhii")
         if state_stack:
             last_state = state_stack.pop()
+            print(last_state)
             # Restore the state
             nonlocal balls, tballs, over_count, total, wickets, extras, overs_runs, curr_runs
             nonlocal batsmans, playing_batsman, partnerships, bowlers, bowler_name, bowler_input_done
             nonlocal bowlsmap, score, scoreMap, scoreFreq, wicketsMap, wicketFreq
 
-            balls = last_state["balls"]
+            '''balls = last_state["balls"]
             tballs = last_state["tballs"]
-            over_count = last_state["over_count"]
-            total = last_state["total"]
-            wickets = last_state["wickets"]
+            over_count = last_state["over_count"]'''
+            a = last_state["total"]
+            print(a)
+            '''wickets = last_state["wickets"]
             extras = last_state["extras"]
             overs_runs = last_state["overs_runs"]
             curr_runs = last_state["curr_runs"]
@@ -100,11 +104,12 @@ def innings():
             scoreMap = last_state["scoreMap"]
             scoreFreq = last_state["scoreFreq"]
             wicketsMap = last_state["wicketsMap"]
-            wicketFreq = last_state["wicketFreq"]
+            wicketFreq = last_state["wicketFreq"]'''
 
             print("Last ball undone successfully!")
         else:
             print("No more actions to undo!")
+        return a
 
     def update_partnership(striker, non_striker, runs, score, partnerships, type_of_ball="0"):
         key = tuple(sorted((striker, non_striker)))
@@ -119,8 +124,12 @@ def innings():
         # global s,ns,curr_playing_batsman,partnerships
         del curr_playing_batsman[out_batsman]
         new_batsman_name = input("Enter the new batsman's name: ")
-        batsmans[new_batsman_name] = bastman_reset
-        curr_playing_batsman[new_batsman_name] = {"score": 0, "balls": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0,
+        if new_batsman_name=="nomore":
+            save_state()
+            innings_end()
+        else:
+            batsmans[new_batsman_name] = bastman_reset
+            curr_playing_batsman[new_batsman_name] = {"score": 0, "balls": 0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0,
                                                   "5": 0, "6": 0}
         if out_batsman == s:
             if out_end == "s":
@@ -159,11 +168,10 @@ def innings():
         return a
 
     def innings_end():
-        print("over")
-        global is_innings_done, target
+        nonlocal is_innings_done,target
         is_innings_done = True
         target = total + 1
-        match_stack.append(state_stack)
+        match_stack.append(state_stack.pop())
 
     def over_ending(tballs, balls, s, ns, bowler_input_done, over_count, bowlers, bowler_name, total, curr_runs):
         if (tballs - balls) % 6 == 5:
@@ -186,9 +194,9 @@ def innings():
             if bowler_name not in bowlers:
                 bowlers[bowler_name] = {"maidens":0, "balls": 0, "runs": 0,"economy":0, "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0,"wk": 0, "by": 0, "lb": 0, "wb": 0, "nb": 0, "db": 0}
                 bowler_input_done = True
-        save_state()
         curr_playing_batsman=playing_batsman
         c=(tballs-balls)%6+1 # just to ask input score for each ball
+        save_state()
         inputscene=input("enter score of {} ball".format((tballs-balls)%6+1)) #scenaio when ball is bowled
         x=inputScenario(inputscene) # to get correct scenario
         if x=="wb":
@@ -243,6 +251,7 @@ def innings():
             extras+=score[x]+score[extra_runs]
             s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
             balls-=1
+            played_balls+=1
             partnerships=update_partnership(s,ns,extra_runs,score,partnerships,x)
         elif x=="wk":
             wickets+=1
@@ -258,7 +267,7 @@ def innings():
                 batsmans[out_batsman] = curr_playing_batsman[out_batsman]
                 batsmans[s] = curr_playing_batsman[s]
                 partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
-                s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+
                 #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
 
 
@@ -271,7 +280,9 @@ def innings():
                 total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
                 curr_runs += score[extra_runs] + score[x]
                 extras += score[type_of_ball]
-
+                s, ns, curr_playing_batsman, batsmans = striker_resetting(out_batsman, out_end, s, ns,
+                                                                          curr_playing_batsman, partnerships, batsmans,
+                                                                          bastman_reset)
                 wicketFreq[type_of_w]+=1
             elif type_of_ball=="wb":
                 #curr_playing_batsman[s]["balls"] += 1
@@ -280,7 +291,7 @@ def innings():
                 batsmans[s] = curr_playing_batsman[s]
                 batsmans[out_batsman] = curr_playing_batsman[out_batsman]
                 partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
-                s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+
                 #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
                 #bowlers[bowler_name][x] += 1
                 #bowlers[bowler_name]["balls"] += 1
@@ -291,7 +302,9 @@ def innings():
                 total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
                 curr_runs += score[extra_runs] + score[x]
                 extras += score[type_of_ball]
-
+                s, ns, curr_playing_batsman, batsmans = striker_resetting(out_batsman, out_end, s, ns,
+                                                                          curr_playing_batsman, partnerships, batsmans,
+                                                                          bastman_reset)
                 wicketFreq[type_of_w] += 1
             elif type_of_ball=="lb" or type_of_ball=="by":
                 curr_playing_batsman[s]["balls"] += 1
@@ -300,7 +313,7 @@ def innings():
                 batsmans[s] = curr_playing_batsman[s]
                 batsmans[out_batsman] = curr_playing_batsman[out_batsman]
                 partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
-                s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+
                 #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
                 #bowlers[bowler_name][x] += 1
                 bowlers[bowler_name]["balls"] += 1
@@ -311,6 +324,10 @@ def innings():
                 total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
                 curr_runs += score[extra_runs] + score[x]
                 extras += score[type_of_ball]
+                played_balls+=1
+                s, ns, curr_playing_batsman, batsmans = striker_resetting(out_batsman, out_end, s, ns,
+                                                                          curr_playing_batsman, partnerships, batsmans,
+                                                                          bastman_reset)
                 s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
                 balls -= 1
                 wicketFreq[type_of_w] += 1
@@ -323,7 +340,7 @@ def innings():
                 batsmans[out_batsman] = curr_playing_batsman[out_batsman]
                 #update_partnership(s, ns, x, extra_runs)
                 partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
-                s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
+                #s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
                 #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
                 bowlers[bowler_name][x] += 1
                 bowlers[bowler_name]["balls"] += 1
@@ -333,11 +350,16 @@ def innings():
                 # teams
                 total,scoreFreq,scoreMap=teams_stats_while_wicket(total,scoreFreq,scoreMap,x, extra_runs, type_of_ball)
                 curr_runs += score[extra_runs] + score[x]
+                s, ns, curr_playing_batsman, batsmans = striker_resetting(out_batsman, out_end, s, ns,curr_playing_batsman, partnerships, batsmans,bastman_reset)
                 s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
+                played_balls+=1
                 balls -= 1
                 wicketFreq[type_of_w] += 1
             batsmans[out_batsman]["diss"]=type_of_w
-        elif x in ["0","1","2","3","4","5","6"]:
+        elif x == "declare":
+            innings_end()
+            pass
+        else:
             curr_playing_batsman[s]["balls"]+=1
             curr_playing_batsman[s]["score"]+=score[x]
             curr_playing_batsman[s][x] += 1
@@ -354,23 +376,15 @@ def innings():
             scoreFreq[x] += 1
             scoreMap[x]+=score[x]
             s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
+            played_balls+=1
             balls -= 1
-        elif x == "undo":
-            undo_last_ball()
+        '''elif x == "undo":
+            total=undo_last_ball(total)
             print(state_stack.pop())
-            print(total)
-        elif x == "declare":
-            target = total + 1
-            match_stack.append(state_stack.pop())
-            # innings_end()
-            print(match_stack)
-            break
+            print(total)'''
         if balls==0:
             save_state()
-            match_stack.append(state_stack.pop())
-            target=total+1
-            print(match_stack)
-
-        print(total)
+            innings_end()
+        print(match_stack)
 
 innings()
