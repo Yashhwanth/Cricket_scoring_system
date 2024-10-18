@@ -1,18 +1,18 @@
 import copy
 match_stack = []
+'''target=0
+target_balls=0'''
 #overs = int(input("no of overs to be played"))
-def innings():
+def innings(target=None,target_balls=None):
     overs = int(input("no of overs to be played"))
     balls = overs * 6
     tballs = balls
     played_balls=0
-    target_balls=None
     over_count = 0
     total = 0
     wickets = 0
     extras = 0
     overs_runs = 0
-    target = 0
     curr_runs = 0
     batsmans = {}
     # batsmanMap={"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0}
@@ -123,6 +123,8 @@ def innings():
         del curr_playing_batsman[out_batsman]
         new_batsman_name = input("Enter the new batsman's name: ")
         if new_batsman_name=="nomore":
+            nonlocal target_balls
+            target_balls=overs*6
             save_state()
             innings_end()
         else:
@@ -166,10 +168,10 @@ def innings():
         return a
 
     def innings_end():
-        nonlocal is_innings_done,target,target_balls
+        nonlocal target
+        nonlocal is_innings_done
         is_innings_done = True
         target = total + 1
-        target_balls=played_balls
         match_stack.append(state_stack.pop())
 
     def over_ending(tballs, balls, s, ns, bowler_input_done, over_count, bowlers, bowler_name, total, curr_runs):
@@ -355,6 +357,8 @@ def innings():
                 wicketFreq[type_of_w] += 1
             batsmans[out_batsman]["diss"]=type_of_w
         elif x == "declare":
+            #nonlocal target_balls
+            target_balls=played_balls
             innings_end()
             pass
         else:
@@ -385,9 +389,10 @@ def innings():
             else:
                 break
         if balls==0:
+            #nonlocal target_balls
+            target_balls=overs*6
             save_state()
             innings_end()
-
-
-innings()
-innings()
+    return target,target_balls
+target,target_balls=innings()
+print(target,target_balls)
