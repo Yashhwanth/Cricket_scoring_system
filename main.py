@@ -6,6 +6,7 @@ def innings():
     balls = overs * 6
     tballs = balls
     played_balls=0
+    target_balls=None
     over_count = 0
     total = 0
     wickets = 0
@@ -74,22 +75,20 @@ def innings():
         }
         state_stack.append(state)
 
-    def undo_last_ball(a):
+    def undo_last_ball():
         print("hhii")
         if state_stack:
             last_state = state_stack.pop()
-            print(last_state)
             # Restore the state
             nonlocal balls, tballs, over_count, total, wickets, extras, overs_runs, curr_runs
             nonlocal batsmans, playing_batsman, partnerships, bowlers, bowler_name, bowler_input_done
             nonlocal bowlsmap, score, scoreMap, scoreFreq, wicketsMap, wicketFreq
 
-            '''balls = last_state["balls"]
+            balls = last_state["balls"]
             tballs = last_state["tballs"]
-            over_count = last_state["over_count"]'''
-            a = last_state["total"]
-            print(a)
-            '''wickets = last_state["wickets"]
+            over_count = last_state["over_count"]
+            total = last_state["total"]
+            wickets = last_state["wickets"]
             extras = last_state["extras"]
             overs_runs = last_state["overs_runs"]
             curr_runs = last_state["curr_runs"]
@@ -104,12 +103,11 @@ def innings():
             scoreMap = last_state["scoreMap"]
             scoreFreq = last_state["scoreFreq"]
             wicketsMap = last_state["wicketsMap"]
-            wicketFreq = last_state["wicketFreq"]'''
+            wicketFreq = last_state["wicketFreq"]
 
             print("Last ball undone successfully!")
         else:
             print("No more actions to undo!")
-        return a
 
     def update_partnership(striker, non_striker, runs, score, partnerships, type_of_ball="0"):
         key = tuple(sorted((striker, non_striker)))
@@ -168,9 +166,10 @@ def innings():
         return a
 
     def innings_end():
-        nonlocal is_innings_done,target
+        nonlocal is_innings_done,target,target_balls
         is_innings_done = True
         target = total + 1
+        target_balls=played_balls
         match_stack.append(state_stack.pop())
 
     def over_ending(tballs, balls, s, ns, bowler_input_done, over_count, bowlers, bowler_name, total, curr_runs):
@@ -187,7 +186,6 @@ def innings():
         return bowlers, bowler_name, total, curr_runs
 
     while balls and not is_innings_done: #if there is a ball it has too be bowled
-        #print((tballs - balls) % 6)
         if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
             curr_runs=0
             bowler_name = input("Enter bowler's name:")
@@ -378,13 +376,18 @@ def innings():
             s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
             played_balls+=1
             balls -= 1
-        '''elif x == "undo":
-            total=undo_last_ball(total)
-            print(state_stack.pop())
-            print(total)'''
+        while True:
+            undo=input("undo??")
+            if undo=="y":
+                print(state_stack)
+                undo_last_ball()
+                print(state_stack)
+            else:
+                break
         if balls==0:
             save_state()
             innings_end()
-        print(match_stack)
 
+
+innings()
 innings()
