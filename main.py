@@ -198,6 +198,7 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
     else:
         target_balls=target_balls
         target=target'''
+    print(target_balls)
     while target_balls and not is_innings_done and total<target: #if there is a ball it has too be bowled
         if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
             curr_runs=0
@@ -262,6 +263,7 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
             extras+=score[x]+score[extra_runs]
             s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
             balls-=1
+            target_balls-=1
             played_balls+=1
             partnerships=update_partnership(s,ns,extra_runs,score,partnerships,x)
         elif x=="wk":
@@ -341,6 +343,7 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
                                                                           bastman_reset)
                 s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
                 balls -= 1
+                target_balls -= 1
                 wicketFreq[type_of_w] += 1
             else:
                 type_of_ball = '0'
@@ -365,6 +368,7 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
                 s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
                 played_balls+=1
                 balls -= 1
+                target_balls -= 1
                 wicketFreq[type_of_w] += 1
             batsmans[out_batsman]["diss"]=type_of_w
         elif x == "declare":
@@ -391,6 +395,7 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
             s,ns,bowler_input_done,over_count,bowlers,bowler_name,total,curr_runs=over_ending(tballs, balls,s,ns, bowler_input_done, over_count,bowlers,bowler_name,total,curr_runs)
             played_balls+=1
             balls -= 1
+            target_balls -= 1
         while True:
             undo=input("undo??")
             if undo=="y":
