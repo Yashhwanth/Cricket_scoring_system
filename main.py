@@ -61,7 +61,14 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
 
     # Stack to store the state after each ball
     state_stack = []
-
+    def other_players():
+        while True:
+            add=input("still add")
+            if add=="y":
+                player=input("enter player's name")
+                batsmans[player] = bastman_reset
+            else:
+                break
     def save_state():
         #state_stack
         state = {
@@ -408,12 +415,15 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
                 break
         if balls==0:
             target_balls=overs*6
+            other_players()
             save_state()
             innings_end()
         if total>=target or target_balls==0:
+            other_players()
             save_state()
             match_stack.append(state_stack.pop())
     return is_innings_done,target,target_balls
 is_innings_done,target,target_balls=innings()
 print(innings(is_innings_done,target,target_balls))
 stats_comaprison(match_stack)
+print(match_stack)
