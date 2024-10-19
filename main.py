@@ -1,11 +1,15 @@
 import copy
 match_stack = []
-'''target=0
-target_balls=0'''
-#overs = int(input("no of overs to be played"))
-def innings(target=None,target_balls=None):
+def innings(is_innings_done=False,target=float('inf'),target_balls=None):
+    #is_innings_done=False
     overs = int(input("no of overs to be played"))
     balls = overs * 6
+    if is_innings_done==False:
+        target_balls = balls
+    else:
+        target_balls = target_balls
+    print(is_innings_done,target,target_balls)
+    is_innings_done=False
     tballs = balls
     played_balls=0
     over_count = 0
@@ -29,7 +33,7 @@ def innings(target=None,target_balls=None):
     bowlers = {}
     bowler_name = None
     bowler_input_done = False
-    is_innings_done = False
+
     bowlsmap = {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "wb": 0, "nb": 1, "db": 0, "wk": 0, "by": 0,
                 "lb": 0}
 
@@ -123,6 +127,8 @@ def innings(target=None,target_balls=None):
         del curr_playing_batsman[out_batsman]
         new_batsman_name = input("Enter the new batsman's name: ")
         if new_batsman_name=="nomore":
+            nonlocal is_innings_done
+            is_innings_done = True
             nonlocal target_balls
             target_balls=overs*6
             save_state()
@@ -186,8 +192,13 @@ def innings(target=None,target_balls=None):
         if curr_runs == 0:
             bowlers[bowler_name]["maidens"] += 1
         return bowlers, bowler_name, total, curr_runs
-
-    while balls and not is_innings_done: #if there is a ball it has too be bowled
+    '''if is_first_innings:
+        target_balls=balls
+        target=float('inf')
+    else:
+        target_balls=target_balls
+        target=target'''
+    while target_balls and not is_innings_done and total<target: #if there is a ball it has too be bowled
         if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
             curr_runs=0
             bowler_name = input("Enter bowler's name:")
@@ -383,9 +394,7 @@ def innings(target=None,target_balls=None):
         while True:
             undo=input("undo??")
             if undo=="y":
-                print(state_stack)
                 undo_last_ball()
-                print(state_stack)
             else:
                 break
         if balls==0:
@@ -393,6 +402,13 @@ def innings(target=None,target_balls=None):
             target_balls=overs*6
             save_state()
             innings_end()
-    return target,target_balls
-target,target_balls=innings()
-print(target,target_balls)
+        if total>=target or target_balls==0:
+            save_state()
+            match_stack.append(state_stack.pop())
+    return is_innings_done,target,target_balls
+is_innings_done,target,target_balls=innings()
+print(match_stack)
+print(is_innings_done,target,target_balls)
+print(innings(is_innings_done,target,target_balls))
+print(match_stack)
+
