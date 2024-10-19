@@ -1,5 +1,15 @@
 import copy
 match_stack = []
+def stats_comaprison(match_stack):
+    first_innings=match_stack[0]
+    second_innings=match_stack[1]
+    f_score=first_innings["total"]
+    s_score=second_innings["total"]
+    if f_score>s_score:
+        print("team a")
+    else:
+        print("team b")
+
 def innings(is_innings_done=False,target=float('inf'),target_balls=None):
     #is_innings_done=False
     overs = int(input("no of overs to be played"))
@@ -192,12 +202,6 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
         if curr_runs == 0:
             bowlers[bowler_name]["maidens"] += 1
         return bowlers, bowler_name, total, curr_runs
-    '''if is_first_innings:
-        target_balls=balls
-        target=float('inf')
-    else:
-        target_balls=target_balls
-        target=target'''
     print(target_balls)
     while target_balls and not is_innings_done and total<target: #if there is a ball it has too be bowled
         if (tballs - balls) % 6 == 0 and not bowler_input_done: # Ask for new bowler at the start of each over
@@ -356,7 +360,8 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
                 partnerships = update_partnership(s, ns, extra_runs, score, partnerships, type_of_ball)
                 #s,ns,curr_playing_batsman,batsmans=striker_resetting(out_batsman, out_end,s,ns,curr_playing_batsman,partnerships,batsmans,bastman_reset)
                 #partnerships=update_partnership(s,ns,extra_runs,score,partnerships,type_of_ball)
-                bowlers[bowler_name][x] += 1
+                if type_of_w!="ro":
+                    bowlers[bowler_name][x] += 1
                 bowlers[bowler_name]["balls"] += 1
                 bowlers[bowler_name][extra_runs] += 1
                 bowlers[bowler_name][type_of_ball] += 1
@@ -372,7 +377,6 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
                 wicketFreq[type_of_w] += 1
             batsmans[out_batsman]["diss"]=type_of_w
         elif x == "declare":
-            #nonlocal target_balls
             target_balls=played_balls
             innings_end()
             pass
@@ -403,7 +407,6 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
             else:
                 break
         if balls==0:
-            #nonlocal target_balls
             target_balls=overs*6
             save_state()
             innings_end()
@@ -412,8 +415,5 @@ def innings(is_innings_done=False,target=float('inf'),target_balls=None):
             match_stack.append(state_stack.pop())
     return is_innings_done,target,target_balls
 is_innings_done,target,target_balls=innings()
-print(match_stack)
-print(is_innings_done,target,target_balls)
 print(innings(is_innings_done,target,target_balls))
-print(match_stack)
-
+stats_comaprison(match_stack)
