@@ -1,16 +1,14 @@
 import copy
 match_stack = []
-
-
 def stats_comaprison(match_stack):
     first_innings = match_stack[0]
     second_innings = match_stack[1]
     f_score = first_innings["total"]
     s_score = second_innings["total"]
     if f_score > s_score:
-        print("team a")
+        print("team a won")
     else:
-        print("team b")
+        print("team b won")
 
 def innings(is_innings_done = False, target = float('inf'), target_balls = None):
     overs = int(input("no of overs to be played"))
